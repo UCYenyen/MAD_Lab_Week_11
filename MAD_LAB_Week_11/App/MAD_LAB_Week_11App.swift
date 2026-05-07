@@ -1,11 +1,5 @@
-//
-//  MAD_LAB_Week_11App.swift
-//  MAD_LAB_Week_11
-//
-//  Created by Bryan Fernando Dinata on 07/05/26.
-//
-
 import SwiftUI
+import SwiftData
 
 @main
 struct MAD_LAB_Week_11App: App {
@@ -13,5 +7,6 @@ struct MAD_LAB_Week_11App: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: [Company.self, Project.self, Employee.self])
     }
 }
