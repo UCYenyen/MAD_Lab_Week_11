@@ -7,6 +7,7 @@ struct CompanyFormView: View {
 
     var company: Company?
 
+    @State private var viewModel = CompanyViewModel()
     @State private var name: String = ""
     @State private var address: String = ""
 
@@ -21,16 +22,16 @@ struct CompanyFormView: View {
             VStack(spacing: 12) {
                 TextField("Company Name", text: $name)
                     .padding(14)
-                    .background(Color(.systemBackground))
+                    .background(Color.gray.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 TextField("Company Address", text: $address)
                     .padding(14)
-                    .background(Color(.systemBackground))
+                    .background(Color.gray.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 Spacer()
             }
             .padding()
-            .background(Color(.systemGroupedBackground))
+            .background(Color.white)
             .navigationTitle(isEditing ? "Edit Company" : "New Company")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -47,6 +48,7 @@ struct CompanyFormView: View {
                 }
             }
             .onAppear {
+                viewModel.modelContext = context
                 if let company {
                     name = company.name
                     address = company.address
@@ -57,13 +59,10 @@ struct CompanyFormView: View {
 
     private func save() {
         if let company {
-            company.name = name
-            company.address = address
+            viewModel.updateCompany(company, name: name, address: address)
         } else {
-            let newCompany = Company(name: name, address: address)
-            context.insert(newCompany)
+            viewModel.addCompany(name: name, address: address)
         }
-        try? context.save()
         dismiss()
     }
 }

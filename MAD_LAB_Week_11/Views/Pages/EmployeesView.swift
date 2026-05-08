@@ -5,20 +5,17 @@ struct EmployeesView: View {
     @Environment(\.modelContext) private var context
     let company: Company
 
+    @State private var viewModel = EmployeeViewModel()
     @State private var showForm = false
     @State private var editing: Employee?
-
-    private var employees: [Employee] {
-        company.employees.sorted { $0.createdAt < $1.createdAt }
-    }
 
     var body: some View {
         ZStack {
             Color(.systemGroupedBackground).ignoresSafeArea()
             ScrollView {
                 LazyVStack(spacing: 12) {
-                    ForEach(employees) { employee in
-                        EmployeeRow(employee: employee)
+                    ForEach(viewModel.getSortedEmployees(for: company)) { employee in
+                        EmployeeRow(employee: employee, viewModel: viewModel)
                             .contextMenu {
                                 Button {
                                     editing = employee
@@ -26,8 +23,7 @@ struct EmployeesView: View {
                                     Label("Edit", systemImage: "pencil")
                                 }
                                 Button(role: .destructive) {
-                                    context.delete(employee)
-                                    try? context.save()
+                                    viewModel.deleteEmployee(employee)
                                 } label: {
                                     Label("Delete", systemImage: "trash")
                                 }
@@ -51,5 +47,6 @@ struct EmployeesView: View {
         .sheet(item: $editing) { employee in
             EmployeeFormView(company: company, employee: employee)
         }
+        .onAppear { viewModel.modelContext = context }
     }
 }

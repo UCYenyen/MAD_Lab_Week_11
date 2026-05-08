@@ -18,10 +18,4 @@ final class Company {
         self.address = address
         self.createdAt = Date()
     }
-
-    var employeeCount: Int { employees.count }
-
-    var activeProjectCount: Int {
-        projects.filter { $0.isActive }.count
-    }
 }

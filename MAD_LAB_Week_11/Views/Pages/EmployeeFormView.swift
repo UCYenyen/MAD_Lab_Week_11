@@ -8,6 +8,7 @@ struct EmployeeFormView: View {
     let company: Company
     var employee: Employee?
 
+    @State private var viewModel = EmployeeViewModel()
     @State private var name: String = ""
     @State private var role: String = ""
 
@@ -26,14 +27,13 @@ struct EmployeeFormView: View {
                 }
             }
             .navigationTitle(isEditing ? "Edit Employee" : "New Employee")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark")
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button { save() } label: {
                         Image(systemName: "checkmark")
                     }
@@ -41,6 +41,7 @@ struct EmployeeFormView: View {
                 }
             }
             .onAppear {
+                viewModel.modelContext = context
                 if let employee {
                     name = employee.name
                     role = employee.role
@@ -51,14 +52,10 @@ struct EmployeeFormView: View {
 
     private func save() {
         if let employee {
-            employee.name = name
-            employee.role = role
+            viewModel.updateEmployee(employee, name: name, role: role)
         } else {
-            let newEmployee = Employee(name: name, role: role)
-            newEmployee.company = company
-            context.insert(newEmployee)
+            viewModel.addEmployee(name: name, role: role, to: company)
         }
-        try? context.save()
         dismiss()
     }
 }

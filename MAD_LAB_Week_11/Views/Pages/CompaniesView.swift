@@ -5,17 +5,18 @@ struct CompaniesView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \Company.createdAt, order: .forward) private var companies: [Company]
 
+    @State private var viewModel = CompanyViewModel()
     @State private var showForm = false
     @State private var editing: Company?
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            Color.white.ignoresSafeArea()
             ScrollView {
                 LazyVStack(spacing: 12) {
                     ForEach(companies) { company in
                         NavigationLink(value: company) {
-                            CompanyCard(company: company)
+                            CompanyCard(company: company, viewModel: viewModel)
                         }
                         .buttonStyle(.plain)
                         .contextMenu {
@@ -25,8 +26,7 @@ struct CompaniesView: View {
                                 Label("Update", systemImage: "checkmark")
                             }
                             Button(role: .destructive) {
-                                context.delete(company)
-                                try? context.save()
+                                viewModel.deleteCompany(company)
                             } label: {
                                 Label("Delete", systemImage: "trash")
                             }
@@ -53,5 +53,6 @@ struct CompaniesView: View {
         .sheet(item: $editing) { company in
             CompanyFormView(company: company)
         }
+        .onAppear { viewModel.modelContext = context }
     }
 }

@@ -17,12 +17,4 @@ final class Employee {
         self.role = role
         self.createdAt = Date()
     }
-
-    var projectCount: Int { projects.count }
-
-    var initials: String {
-        let parts = name.split(separator: " ")
-        let letters = parts.prefix(2).compactMap { $0.first }
-        return String(letters).uppercased()
-    }
 }

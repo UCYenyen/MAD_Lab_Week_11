@@ -2,20 +2,24 @@ import SwiftUI
 import SwiftData
 
 struct CompanyDetailView: View {
+    @Environment(\.modelContext) private var context
     let company: Company
+
+    @State private var employeeVM = EmployeeViewModel()
+    @State private var projectVM = ProjectViewModel()
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            Color.white.ignoresSafeArea()
             VStack(spacing: 12) {
                 NavigationLink {
                     EmployeesView(company: company)
                 } label: {
                     MenuLinkRow(
                         icon: "person.3.fill",
-                        iconColor: .blue,
+                        iconColor: Color.blue,
                         title: "Employees",
-                        count: company.employees.count
+                        count: employeeVM.getSortedEmployees(for: company).count
                     )
                 }
                 .buttonStyle(.plain)
@@ -25,9 +29,9 @@ struct CompanyDetailView: View {
                 } label: {
                     MenuLinkRow(
                         icon: "folder.fill",
-                        iconColor: .green,
+                        iconColor: Color.green,
                         title: "Projects",
-                        count: company.projects.count
+                        count: projectVM.getSortedProjects(for: company).count
                     )
                 }
                 .buttonStyle(.plain)
@@ -37,6 +41,9 @@ struct CompanyDetailView: View {
             .padding()
         }
         .navigationTitle(company.name)
-        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            employeeVM.modelContext = context
+            projectVM.modelContext = context
+        }
     }
 }

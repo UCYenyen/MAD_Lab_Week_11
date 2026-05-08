@@ -24,7 +24,7 @@ struct MenuLinkRow: View {
                 .foregroundStyle(.secondary)
         }
         .padding(14)
-        .background(Color(.systemBackground))
+        .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
     }

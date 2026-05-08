@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ProjectCard: View {
     let project: Project
+    let viewModel: ProjectViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -9,7 +10,7 @@ struct ProjectCard: View {
                 Text(project.name)
                     .font(.headline)
                 Spacer()
-                StatusBadge(isActive: project.isActive)
+                StatusBadge(isActive: viewModel.isActive(project))
             }
             Text(project.detail)
                 .font(.subheadline)
@@ -18,7 +19,7 @@ struct ProjectCard: View {
             HStack(spacing: 6) {
                 Image(systemName: "calendar")
                     .font(.footnote)
-                Text(AppDateFormatter.range(project.startDate, project.endDate))
+                Text(viewModel.dateRange(project))
                     .font(.footnote)
             }
             .foregroundStyle(.secondary)
@@ -32,7 +33,7 @@ struct ProjectCard: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.systemBackground))
+        .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
     }

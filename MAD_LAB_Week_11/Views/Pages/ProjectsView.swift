@@ -5,20 +5,17 @@ struct ProjectsView: View {
     @Environment(\.modelContext) private var context
     let company: Company
 
+    @State private var viewModel = ProjectViewModel()
     @State private var showForm = false
     @State private var editing: Project?
-
-    private var projects: [Project] {
-        company.projects.sorted { $0.endDate < $1.endDate }
-    }
 
     var body: some View {
         ZStack {
             Color(.systemGroupedBackground).ignoresSafeArea()
             ScrollView {
                 LazyVStack(spacing: 12) {
-                    ForEach(projects) { project in
-                        ProjectCard(project: project)
+                    ForEach(viewModel.getSortedProjects(for: company)) { project in
+                        ProjectCard(project: project, viewModel: viewModel)
                             .contextMenu {
                                 Button {
                                     editing = project
@@ -26,8 +23,7 @@ struct ProjectsView: View {
                                     Label("Update", systemImage: "checkmark")
                                 }
                                 Button(role: .destructive) {
-                                    context.delete(project)
-                                    try? context.save()
+                                    viewModel.deleteProject(project)
                                 } label: {
                                     Label("Delete", systemImage: "trash")
                                 }
@@ -51,5 +47,6 @@ struct ProjectsView: View {
         .sheet(item: $editing) { project in
             ProjectFormView(company: company, project: project)
         }
+        .onAppear { viewModel.modelContext = context }
     }
 }

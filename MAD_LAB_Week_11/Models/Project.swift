@@ -19,8 +19,4 @@ final class Project {
         self.endDate = endDate
         self.createdAt = Date()
     }
-
-    var isActive: Bool {
-        Date() < endDate
-    }
 }

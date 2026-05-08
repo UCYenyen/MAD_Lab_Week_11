@@ -8,6 +8,8 @@ struct ProjectFormView: View {
     let company: Company
     var project: Project?
 
+    @State private var viewModel = ProjectViewModel()
+    @State private var employeeVM = EmployeeViewModel()
     @State private var name: String = ""
     @State private var detail: String = ""
     @State private var startDate: Date = Date()
@@ -67,9 +69,11 @@ struct ProjectFormView: View {
                 }
             }
             .sheet(isPresented: $showEmployeePicker) {
-                EmployeePickerView(company: company, selected: $personInCharge)
+                EmployeePickerView(company: company, viewModel: employeeVM, selected: $personInCharge)
             }
             .onAppear {
+                viewModel.modelContext = context
+                employeeVM.modelContext = context
                 if let project {
                     name = project.name
                     detail = project.detail
@@ -83,18 +87,24 @@ struct ProjectFormView: View {
 
     private func save() {
         if let project {
-            project.name = name
-            project.detail = detail
-            project.startDate = startDate
-            project.endDate = endDate
-            project.personInCharge = personInCharge
+            viewModel.updateProject(
+                project,
+                name: name,
+                detail: detail,
+                startDate: startDate,
+                endDate: endDate,
+                personInCharge: personInCharge
+            )
         } else {
-            let newProject = Project(name: name, detail: detail, startDate: startDate, endDate: endDate)
-            newProject.company = company
-            newProject.personInCharge = personInCharge
-            context.insert(newProject)
+            viewModel.addProject(
+                name: name,
+                detail: detail,
+                startDate: startDate,
+                endDate: endDate,
+                personInCharge: personInCharge,
+                to: company
+            )
         }
-        try? context.save()
         dismiss()
     }
 }
@@ -102,6 +112,7 @@ struct ProjectFormView: View {
 struct EmployeePickerView: View {
     @Environment(\.dismiss) private var dismiss
     let company: Company
+    let viewModel: EmployeeViewModel
     @Binding var selected: Employee?
 
     var body: some View {
@@ -119,7 +130,7 @@ struct EmployeePickerView: View {
                         }
                     }
                 }
-                ForEach(company.employees.sorted { $0.name < $1.name }) { employee in
+                ForEach(viewModel.sortedByName(for: company)) { employee in
                     Button {
                         selected = employee
                         dismiss()
